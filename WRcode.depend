@@ -1,0 +1,9 @@
+# depslib dependency file v1.0
+1584892952 source:e:\infographie\projet\wrcode\main.cpp
+	<opencv2/core/core.hpp>
+	<opencv2/imgcodecs.hpp>
+	<opencv2/highgui/highgui.hpp>
+	<opencv2/imgproc.hpp>
+	<iostream>
+	<string>
+
