@@ -80,6 +80,7 @@ int main()
 
     normalize(texture, texture, 0.0, 255, NORM_MINMAX, -1, Mat() );
 
+    imwrite("./resources/textures/texture_200_70.jpg", texture);
     imshow( "Image", texture );
     waitKey(0);
     Mat histo = histoToMat(texture);
@@ -89,7 +90,7 @@ int main()
     //------- Read QR code image -------
 
     //define the variable imageQR of type string with the path to the QR code image
-    string imageQR("./resources/qrtest.png"); // path to the image
+    string imageQR("./resources/qrcodes/qrtest.png"); // path to the image
 
     Mat imgQr;
     imgQr = imread(imageQR, IMREAD_GRAYSCALE); // Read the file as a grayscale
@@ -104,6 +105,7 @@ int main()
     waitKey(0);
 
     Mat W_QRcode = substitution(imgQr,texture);
+    imwrite("./resources/wqrcodes/wqrcode_200_70_1.jpg", W_QRcode);
     imshow("W_QRcode",W_QRcode);
     waitKey(0);
     return 0;
