@@ -1,0 +1,12 @@
+---
+title: "Infographie"
+output: html_document
+---
+```{r}
+library(scales)
+
+data=read.csv2("../t.csv",header=TRUE,sep = ';')
+normalize(data,range=(0,1))
+
+```
+

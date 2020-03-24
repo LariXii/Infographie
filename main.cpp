@@ -4,6 +4,8 @@
 #include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <math.h>
 
 
 using namespace cv;
@@ -72,6 +74,81 @@ Mat substitution(Mat qrcode, Mat texture){
     return newImg;
 }
 
+Mat binarysationNiblack(Mat img, int l){
+    float k = -0.2;
+    int nbCols = img.cols;
+    int nbRows = img.rows;
+
+    Mat newImg;
+    img.copyTo(newImg); //Copie de la matrice img dans une nouvelle matrice newImg
+
+    for(int x = 0 ; x < nbRows - (l - 1) ; x += l){
+        for(int y = 0 ; y < nbCols - (l - 1) ; y += l){
+
+            vector<uchar> v; //Vector de uchar pour stocker les pixels de la fenêtre glissante
+
+            for(int i = 0 ; i < l ; i++){
+                for(int j = 0 ; j < l ; j++){
+                    //Ajout de la valeur du pixel(x+i,y+j) dans le vector v
+                    v.push_back(img.at<uchar>(x + i, y + j));
+                }
+            }
+
+            Scalar mean; //Variable pour sotcker la moyenne de la fenêtre glissante
+            Scalar deviation; //Variable pour sotcker l'écart type de la fenêtre glissante
+            meanStdDev(v,mean,deviation); //Calcul de la moyenne et l'écart type du vector v
+
+            int seuil = mean.val[0] + k * deviation.val[0]; //Calcul du seuil
+
+            for(int i = 0 ; i < l ; i++){
+                for(int j = 0 ; j < l ; j++){
+                    if(img.at<uchar>(x + i, y + j) <= seuil ){ //Comparaison entre la valeur du pixel et la valeur du seuil
+                        newImg.at<uchar>(x + i, y + j) = 0;
+                    }
+                    else{
+                        newImg.at<uchar>(x + i, y + j) = 255;
+                    }
+                }
+            }
+        }
+    }
+    return newImg;
+}
+
+void moyenne_block(Mat wqrcode, int l = 8){
+    int nbCols = wqrcode.cols;
+    int nbRows = wqrcode.rows;
+    ofstream myfile;
+    myfile.open ("t.csv");
+    myfile << "Moyenne;Variance\n";
+    for(int x = 0 ; x < nbRows - (l - 1) ; x += l){
+        for(int y = 0 ; y < nbCols - (l - 1) ; y += l){
+
+            vector<uchar> v; //Vector de uchar pour stocker les pixels de la fenêtre glissante
+
+            for(int i = 0 ; i < l ; i++){
+                for(int j = 0 ; j < l ; j++){
+                    //Ajout de la valeur du pixel(x+i,y+j) dans le vector v
+                    v.push_back(wqrcode.at<uchar>(x + i, y + j));
+                }
+            }
+
+            Scalar mean; //Variable pour sotcker la moyenne de la fenêtre glissante
+            Scalar deviation; //Variable pour sotcker l'écart type de la fenêtre glissante
+            meanStdDev(v,mean,deviation); //Calcul de la moyenne et l'écart type du vector v
+
+            double somme_var;
+            int v_size = v.size();
+            for (int i = 0 ; i < v_size ; ++i){
+                somme_var += pow((v[i]-mean.val[0]),2);
+            }
+            somme_var = somme_var/63;
+
+            myfile << mean.val[0] << ";" << somme_var << endl;
+        }
+    }
+    myfile.close();
+}
 
 int main()
 {
@@ -108,5 +185,19 @@ int main()
     imwrite("./resources/wqrcodes/wqrcode_200_70_1.jpg", W_QRcode);
     imshow("W_QRcode",W_QRcode);
     waitKey(0);
+
+    moyenne_block(texture);
+
+    /*
+    ofstream myfile;
+    myfile.open ("example.csv");
+    myfile << "This is the first cell in the first column.\n";
+    myfile << "a,b,c,\n";
+    myfile << "c,s,v,\n";
+    myfile << "1,2,3.456\n";
+    myfile << "semi;colon";
+    myfile.close();
+    */
+
     return 0;
 }
