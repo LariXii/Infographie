@@ -3,10 +3,12 @@ title: "Infographie"
 output: html_document
 ---
 ```{r}
-library(scales)
-
 data=read.csv2("../t.csv",header=TRUE,sep = ';')
-normalize(data,range=(0,1))
+data$Moyenne <- as.numeric(as.character(data$Moyenne))
+data$Variance <- as.numeric(as.character(data$Variance))
+data
+hist(data$Variance)
+
 
 ```
 
